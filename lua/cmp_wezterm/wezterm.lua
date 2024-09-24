@@ -1,3 +1,5 @@
+local config = require "cmp_wezterm.config"
+
 ---@class CmpWeztermWezterm
 ---@field callback fun(result?: string[]): nil
 ---@field word string
@@ -16,7 +18,7 @@ function Wezterm:gather()
   if not current_pane_id then
     return self.callback()
   end
-  self:system({ "wezterm", "cli", "list" }, function(result)
+  self:system({ "cli", "list" }, function(result)
     local pane_ids = vim.iter(vim.gsplit(result, "\n", { plain = true })):fold({}, function(a, b)
       local win_id, tab_id, pane_id = b:match "^%s*(%d+)%s+(%d+)%s+(%d+)"
       if win_id and tab_id and pane_id and pane_id ~= current_pane_id then
@@ -40,7 +42,7 @@ function Wezterm:fetch_panes(pane_ids)
   local word_map = {}
   ---@param pane_id string
   vim.iter(pane_ids):each(function(pane_id)
-    self:system({ "wezterm", "cli", "get-text", "--pane-id", pane_id }, function(content)
+    self:system({ "cli", "get-text", "--pane-id", pane_id }, function(content)
       self:parse_pane(word_map, content)
       count = count + 1
       if count == #pane_ids then
@@ -76,7 +78,8 @@ end
 ---@param cmd string[]
 ---@param cb fun(result: string): nil
 function Wezterm:system(cmd, cb)
-  vim.system(cmd, { text = true }, function(obj)
+  table.insert(cmd, 1, config.executable)
+  local ok, err = pcall(vim.system, cmd, { text = true }, function(obj)
     if obj.code == 0 then
       cb(obj.stdout)
     else
@@ -84,6 +87,10 @@ function Wezterm:system(cmd, cb)
       self.callback()
     end
   end)
+  if not ok then
+    require("cmp.utils.debug").log(("[cmp_wezterm] failed to spawn: %s"):format(err))
+    self.callback()
+  end
 end
 
 return {
