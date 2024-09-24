@@ -6,7 +6,7 @@ local source = {}
 
 ---@return CmpWezterm
 source.new = function()
-  config.set(require("cmp.config").get_source_config("wezterm").option)
+  config.set()
   return setmetatable({}, { __index = source })
 end
 
