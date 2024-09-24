@@ -16,7 +16,7 @@ This is a source for nvim-cmp to search candidates from contents of any other pa
 
 ```lua
 -- This is an example for lazy.nvim
-{ "delphinus/cmp-ctags" },
+{ "delphinus/cmp-wezterm" },
 ```
 
 ## Configuration
