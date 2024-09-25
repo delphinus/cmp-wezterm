@@ -1,18 +1,15 @@
 ---@class CmpWeztermOptions
 ---@field executable? string
 ---@field keyword_pattern? string
----@field label? string
 ---@field trigger_characters? string[]
 
 ---@class CmpWeztermRawConfig
 ---@field executable string
 ---@field keyword_pattern string
----@field label string
 ---@field trigger_characters string[]
 local default_config = {
   executable = "wezterm",
   keyword_pattern = [[\w\+]],
-  label = "[wez]",
   trigger_characters = { "." },
 }
 
