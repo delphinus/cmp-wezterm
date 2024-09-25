@@ -1,7 +1,7 @@
 ---@class CmpWeztermOptions
----@field executable? string
----@field keyword_pattern? string
----@field trigger_characters? string[]
+---@field executable? string default: "wezterm"
+---@field keyword_pattern? string default: [[\w\+]]
+---@field trigger_characters? string[] default: { "." }
 
 ---@class CmpWeztermRawConfig
 ---@field executable string
