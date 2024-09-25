@@ -38,8 +38,10 @@ function source:complete(request, callback)
   wezterm.start(word, function(words)
     callback(words and vim
       .iter(words)
-      :map(function(v)
-        return { word = v, label = v, labelDetails = { detail = config.label } }
+      ---@param w string
+      ---@param pane CmpWeztermPane
+      :map(function(w, pane)
+        return { word = w, label = w, labelDetails = { detail = ("%s:%s:%s"):format(pane.win, pane.tab, pane.id) } }
       end)
       :totable())
   end)
