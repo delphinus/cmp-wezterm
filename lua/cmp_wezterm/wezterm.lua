@@ -12,6 +12,15 @@ Wezterm.new = function(word, callback)
   return setmetatable({ word = word:lower(), callback = callback }, { __index = Wezterm })
 end
 
+---@class CmpWeztermPane
+---@field id string
+---@field tab string
+---@field win string
+
+---@class CmpWeztermPaneList
+---@field panes CmpWeztermPane
+---@field current { tab?: string, win?: string }
+
 ---@return nil
 function Wezterm:gather()
   local current_pane = vim.env.WEZTERM_PANE
@@ -19,21 +28,35 @@ function Wezterm:gather()
     return self.callback()
   end
   self:system({ "cli", "list" }, function(result)
-    local panes = vim.iter(vim.gsplit(result, "\n", { plain = true })):fold({}, function(a, b)
-      local win, tab, id = b:match "^%s*(%d+)%s+(%d+)%s+(%d+)"
-      if win and tab and id and id ~= current_pane then
-        table.insert(a, { id = id, win = win, tab = tab })
+    ---@type CmpWeztermPaneList
+    local pane_list = vim.iter(vim.gsplit(result, "\n", { plain = true })):fold(
+      { panes = {}, current = {} },
+      ---@param a CmpWeztermPaneList
+      ---@param b string
+      function(a, b)
+        local win, tab, id = b:match "^%s*(%d+)%s+(%d+)%s+(%d+)"
+        if win and tab and id then
+          if id == current_pane then
+            a.current.tab = tab
+            a.current.win = win
+          else
+            table.insert(a.panes, { id = id, win = win, tab = tab })
+          end
+        end
+        return a
       end
-      return a
-    end)
+    )
+    local panes = vim
+      .iter(pane_list.panes)
+      ---@param pane CmpWeztermPane
+      :filter(function(pane)
+        return (config.all_windows or pane.win == pane_list.current.win)
+          and (config.all_tabs or pane.tab == pane_list.current.tab)
+      end)
+      :totable()
     self:fetch_panes(panes)
   end)
 end
-
----@class CmpWeztermPane
----@field id string
----@field tab string
----@field win string
 
 ---@private
 ---@param panes CmpWeztermPane[]
@@ -48,7 +71,7 @@ function Wezterm:fetch_panes(panes)
   ---@param pane CmpWeztermPane
   vim.iter(panes):each(function(pane)
     self:system({ "cli", "get-text", "--pane-id", pane.id }, function(content)
-      self:parse_pane(pane,word_map, content)
+      self:parse_pane(pane, word_map, content)
       count = count + 1
       if count == #panes then
         self.callback(word_map)
@@ -62,7 +85,7 @@ end
 ---@param word_map table<string, CmpWeztermPane>
 ---@param content string
 ---@return nil
-function Wezterm:parse_pane(pane,word_map, content)
+function Wezterm:parse_pane(pane, word_map, content)
   ---@param word string
   vim.iter(content:gmatch "[%w%d_:/.%-~]+"):each(function(word)
     if not word:lower():match(self.word) then
