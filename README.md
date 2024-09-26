@@ -29,13 +29,20 @@ require("cmp").setup {
       -- default values
       option = {
         keyword_pattern = [[\w\+]],
-        label = "[wez]",
         trigger_characters = { "." },
       },
     },
   },
 }
 ```
+## TODO
+
+* [ ] doc
+* [x] Capture only the current tab / window.
+* [ ] Capture history
+* [ ] Capture workspaces
+* [ ] Capture clients
+
 ## See also
 
 * [andersevenrud/cmp-tmux: Tmux completion source for nvim-cmp and nvim-compe](https://github.com/andersevenrud/cmp-tmux)
