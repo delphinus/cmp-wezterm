@@ -15,35 +15,17 @@ This is a source for nvim-cmp to search candidates from contents of any other pa
 ## Installation
 
 ```lua
--- This is an example for lazy.nvim
 { "delphinus/cmp-wezterm" },
 ```
 
-## Configuration
+## More info
 
-```lua
-require("cmp").setup {
-  sources = {
-    {
-      name = "wezterm",
-      -- default values
-      option = {
-        keyword_pattern = [[\w\+]],
-        trigger_characters = { "." },
-      },
-    },
-  },
-}
-```
+See detail in [doc](doc/cmp-wezterm.txt).
+
 ## TODO
 
-* [ ] doc
+* [x] doc
 * [x] Capture only the current tab / window.
 * [ ] Capture history
 * [ ] Capture workspaces
 * [ ] Capture clients
-
-## See also
-
-* [andersevenrud/cmp-tmux: Tmux completion source for nvim-cmp and nvim-compe](https://github.com/andersevenrud/cmp-tmux)
-    * Some code of this plugin is derived from cmp-tmux.
